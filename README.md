@@ -1,0 +1,1 @@
+Tentris Coding Guidelines
