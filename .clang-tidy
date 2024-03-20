@@ -2,6 +2,7 @@ Checks: '-*,
 bugprone-*,
 cert-*,
 cppcoreguidelines-*,
+-cppcoreguidelines-pro-type-union-access,
 google-readability-casting,
 google-default-arguments,
 google-explicit-constructor,
@@ -77,10 +78,6 @@ readability-identifier-naming'
 CheckOptions:
   - key:             readability-identifier-naming.ClassConstantCase
     value:           UPPER_CASE
-  - key:             readability-identifier-naming.ClassMemberCase
-    value:           lower_case
-  - key:             readability-identifier-naming.ClassMethodCase
-    value:           lower_case
   - key:             readability-identifier-naming.ConceptCase
     value:           CamelCase
   - key:             readability-identifier-naming.EnumCase
@@ -102,8 +99,20 @@ CheckOptions:
   - key:             readability-identifier-naming.ParameterCase
     value:           lower_case
   - key:             readability-identifier-naming.TemplateParameterCase
-    value:           UPPER_CASE
+    value:           CamelCase
+  - key:             readability-identifier-naming.TypeTemplateParameterCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.ValueTemplateParameterCase
+    value:           lower_case
   - key:             readability-identifier-naming.TypeAliasCase
     value:           lower_case
   - key:             readability-identifier-naming.TypedefCase
     value:           lower_case
+  - key:             readability-identifier-naming.PrivateMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.PrivateMemberSuffix
+    value:           _
+  - key:             readability-identifier-naming.ProtectedMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ProtectedMemberSuffix
+    value:           _
