@@ -77,7 +77,7 @@ readability-use-anyofallof,
 readability-identifier-naming'
 CheckOptions:
   - key:             readability-identifier-naming.ClassConstantCase
-    value:           UPPER_CASE
+    value:           lower_case
   - key:             readability-identifier-naming.ConceptCase
     value:           CamelCase
   - key:             readability-identifier-naming.EnumCase
