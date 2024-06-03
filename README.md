@@ -14,64 +14,64 @@ auto x = std::move(func()); // bad, forces a move, prevents RVO
 
 // 2: prefer direct return of value vs naming the value first
 std::string f_bad(bool b) {
-	std::string ret;
+    std::string ret;
 	
-	if (b) {
-		ret = "Hello";
-	} else {
-		ret = "World";
-	}
+    if (b) {
+        ret = "Hello";
+    } else {
+        ret = "World";
+    }
 	
-	return ret;
+    return ret;
 }
 
 std::string f_good(bool b) {
-	if (b) {
-		return "Hello";
-	} else {
-		return "World";
-	}
+    if (b) {
+        return "Hello";
+    } else {
+        return "World";
+    }
 }
 
 // 3: do not make (non-trivial) objects you intend to return const
 std::vector<int> g_bad() {
-	std::vector<int> const x{1, 2, 3}; // the const here prevents NRVO, don't make (non-trivial) things you want to return later const
-	return x;
+    std::vector<int> const x{1, 2, 3}; // the const here prevents NRVO, don't make (non-trivial) things you want to return later const
+    return x;
 }
 
 // 4: do not move the return value inside the function
 std::vector<int> h_bad() {
-	std::vector<int> x{1, 2, 3};
-	return std::move(x); // just as bad as 2, the move prevents NRVO
+    std::vector<int> x{1, 2, 3};
+    return std::move(x); // just as bad as 2, the move prevents NRVO
 }
 
 // 5: avoid naming things (if it doesn't make the code unreadable)
 struct S {
-	std::string s;
+    std::string s;
 };
 
 void i_worst() {
-	S x;
-	x.s = "Hello";
+    S x;
+    x.s = "Hello";
 	
-	S y;
-	y.s = "World";
+    S y;
+    y.s = "World";
 	
-	std::array<S, 2> arr{std::move(x), std::move(y)}; // not optimized, requires move
+    std::array<S, 2> arr{std::move(x), std::move(y)}; // not optimized, requires move
 }
 
 void i_best() {
-	std::array<S, 2> arr{S{.s = "Hello"}, S{.s = "World"}}; // this is optimized
+    std::array<S, 2> arr{S{.s = "Hello"}, S{.s = "World"}}; // this is optimized
 }
 
 void i_if_best_is_not_possible() {
-	auto create_S = [](char const *s) {
-		S x;
-		x.s = s;
-		return x; // NRVO applies here
-	};
+    auto create_S = [](char const *s) {
+        S x;
+        x.s = s;
+        return x; // NRVO applies here
+    };
 	
-	std::array<S, 2> arr{create_S("Hello"), create_S("World")}; // this is still optimized because of NRVO
+    std::array<S, 2> arr{create_S("Hello"), create_S("World")}; // this is still optimized because of NRVO
 }
 ```
 
@@ -179,20 +179,20 @@ Example:
 ```cpp
 // legacy
 struct S {
-	int x;
+    int x;
 	
-	void f() const {
-		do_stuff(this->x);
-	}
+    void f() const {
+        do_stuff(this->x);
+    }
 };
 
 // explicit
 struct S {
-	int x;
+    int x;
 	
-	void f(this S const &self) {
-		do_stuff(self.x);
-	}
+    void f(this S const &self) {
+        do_stuff(self.x);
+    }
 };
 ```
 
