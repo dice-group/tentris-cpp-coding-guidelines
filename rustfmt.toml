@@ -1,0 +1,4 @@
+imports_granularity = "Crate"
+max_width = 120
+struct_lit_width = 70
+match_block_trailing_comma = true
