@@ -122,3 +122,5 @@ CheckOptions:
     value:           lower_case
   - key:             readability-identifier-naming.ProtectedMemberSuffix
     value:           _
+  - key:             readability-operator-representation
+    value:           "&&;&=;&;|;~;!;!=;||;|=;^;^="
