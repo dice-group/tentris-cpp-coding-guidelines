@@ -127,5 +127,7 @@ CheckOptions:
     value:           lower_case
   - key:             readability-identifier-naming.ProtectedMemberSuffix
     value:           _
-  - key:             readability-operator-representation
+  - key:             readability-operator-representation.BinaryOperators
+    value:           "&&;&=;&;|;~;!;!=;||;|=;^;^="
+  - key:             readability-operator-representation.OverloadedOperators
     value:           "&&;&=;&;|;~;!;!=;||;|=;^;^="
