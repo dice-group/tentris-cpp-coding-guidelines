@@ -10,6 +10,7 @@ cppcoreguidelines-*,
 -cppcoreguidelines-pro-type-reinterpret-cast,
 -cppcoreguidelines-owning-memory,
 -cppcoreguidelines-init-variables,
+-cppcoreguidelines-pro-bounds-constant-array-index,
 google-readability-casting,
 google-explicit-constructor,
 google-runtime-operator,
@@ -78,7 +79,8 @@ readability-static-definition-in-anonymous-namespace,
 readability-string-compare,
 readability-uniqueptr-delete-release,
 readability-use-anyofallof,
-readability-identifier-naming'
+readability-identifier-naming
+readability-operator-representation'
 CheckOptions:
   - key:             readability-identifier-naming.ClassConstantCase
     value:           lower_case
