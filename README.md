@@ -75,6 +75,43 @@ void i_if_best_is_not_possible() {
 }
 ```
 
+## Forwarding constructors
+Sometimes when you have a wrapper type around another object you maybe be tempted to write a constructor like the following:
+```c++
+struct Wrapper {
+private:
+    Inner inner_;
+
+public:
+    template<typename ...Args>
+    explicit Wrapper(Args &&...args) : inner_{std::forward<Args>(args)...} {
+    }
+
+    Wrapper(Wrapper const &other) = default;
+    Wrapper(Wrapper &&other) = default;
+};
+```
+
+The issue with this construct is that the forwarding constructor **swallows all constructor calls**, even those that would normally go to the copy or move constructors of `Wrapper`.
+To fix this we can utilize `std::in_place_t` like so:
+
+```c++
+struct Wrapper {
+private:
+    Inner inner_;
+
+public:
+    template<typename ...Args>
+    explicit Wrapper(std::in_place_t, Args &&...args) : inner_{std::forward<Args>(args)...} {
+    }
+
+    Wrapper(Wrapper const &other) = default;
+    Wrapper(Wrapper &&other) = default;
+};
+```
+
+The tag type resolves this issue.
+
 ## Casing of Entities
 
 ### global type names
