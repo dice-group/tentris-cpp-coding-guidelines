@@ -49,6 +49,8 @@ BreakInheritanceList: BeforeColon
 ColumnLimit: 0
 CompactNamespaces: true
 ContinuationIndentWidth: 8
+DerivePointerAlignment: false
+PackConstructorInitializers: Never
 FixNamespaceComments: true
 IndentCaseLabels: true
 IndentPPDirectives: None
@@ -65,7 +67,7 @@ PointerAlignment: Right
 QualifierAlignment: Custom
 QualifierOrder: ['inline', 'static', 'constexpr', 'type', 'const', 'volatile']
 ReflowComments: false
-RequiresClausePosition: OwnLine
+RequiresClausePosition: WithPreceding
 SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: false
@@ -73,7 +75,17 @@ SpaceBeforeAssignmentOperators: true
 SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: ControlStatements
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: true
+  AfterFunctionDeclarationName: false
+  AfterFunctionDefinitionName: false
+  AfterIfMacros: true
+  AfterOverloadedOperator: false
+  BeforeNonEmptyParentheses: false
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: true
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 2
