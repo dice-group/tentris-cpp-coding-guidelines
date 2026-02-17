@@ -233,10 +233,160 @@ struct S {
 };
 ```
 
-Guidance suggestion:
+Guidance:
+Use legacy declarations for all normal things.
+Use explicit declarations for deducing this.
 
-Always use explicit style. Reasons:
+Reason: the explicit version is just a little too much boilerplate for regular usage. 
 
-1. explicit style can pass object by value (just leave out the reference)
-2. explicit style supports universal/forwarding reference this (just make it a template with && self param)
-3. taking the address of a new-style member function is actually just a regular function pointer, not a member-function-pointer. Just like it should be.
+
+## `std::ranges` from hell
+This section is about quirks in `std::ranges` that will come to haunt you if you ever need to write
+custom views.
+
+### What even are `std::ranges::owning_view`, `std::ranges::ref_view` and `std::views::all`?
+In ranges pipelines it is only possible to use views. Not all ranges are views.
+For instance, `std::vector` is a range, but not a view; makes sense.
+
+So how is it possible to use a `std::vector` in a ranges pipeline?
+Through the magic of `std::views::all`, the ranges library implicitly wraps the vector
+in `std::views::all_t` (via `std::views::all`) to make it a view.
+
+`std::views::all_t<R>` is basically just:
+- the range itself if it is already a view
+- `std::ranges::ref_view<R>` if `R` is an l-value but **not** a view yet
+- `std::ranges::owning_view<R>` if `R` is an r-value but **not** a view yet
+
+`std::ranges::ref_view<R>` just wraps a reference to the original range and makes it a view.  
+`std::ranges::owning_view<R>` takes ownership of the original range and makes it a **move only** view.
+
+The quirk is that, counterintuitively, there are actually non-copyable views. This is fine in principle, you just need to think about
+it occasionally.
+
+
+### Single-Use Ranges
+They don't exist. There is no such thing as a single-use range, it is assumed that you can call `begin()` as often as you want
+on any range.
+
+The following is **not** a valid range, even though it could technically be one.
+```c++
+struct R {
+    auto begin() &&;
+    static auto end();
+};
+```
+
+### Reversible Ranges
+You probably know `std::views::reverse`, it is a handy tool to reverse any range. Except that it isn't always.
+
+You might think, that all you need to reverse a range is:
+```c++
+template<typename R>
+concept reverse_range = requires (R &range) {
+    std::ranges::rbegin(range);
+    std::ranges::rend(range);
+};
+```
+
+And you would be right, but this is **not** what `std::views::reverse` requires.
+`std::views::reverse` actually requires a `std::ranges::bidirectional_range`,  which is
+```c++
+template<typename R>
+concept bidirectional_range = std::ranges::range<R> 
+    && std::ranges::bidirectional_iterator<std::ranges::iterator_t<R>>;
+```
+
+So, according to the standard committee, to be able to reverse a range, the iterator must actually be able to iterate
+in both directions, regardless of the range providing `rbegin()` and `rend()`.
+
+This is because they just always create a reversed-range by wrapping the `begin()` and `end()` iterators in `std::reverse_iterator`
+instead of using the `reverse_iterator` of the range itself.
+
+
+### Random access ranges
+For some reason random access strictly requires bidirectional access. This is probably an artifact from the
+legacy iterator concepts that they didn't bother to change.
+
+You cannot have a forward-range with forward-random-access and fulfill `std::ranges::random_access_range`.
+Also, there is no `forward_random_access_range`.
+
+Algorithms that would be perfectly fine with just forward-random-access still require full-random-access with bidirectional-random-access-iterators.
+
+### Storing temporaries from operator*
+If you need to perform multiple operations on the result of operator*, e.g. when you are implementing a pipeline-view,
+you might be tempted to write something like the following:
+
+```c++
+auto operator*() {
+    auto v = *base_iter_;
+    
+    if (pred(v)) {
+        return op1(v);
+    } else {
+        return op2(v);
+    }
+}
+```
+
+This however, is inefficient in some cases.
+
+Example 1:
+- the return-type of the base iterator is `std::vector<int> const &`.
+- the predicate takes the argument by `const &`
+- op1 and op2 just fetch the size of the vector (they also take `const &`)
+
+Now we have the scenario where we copy the whole vector even when we don't have to.
+Putting `op1(std::move(v))` does not help here (because `std::vector<int> const &` is not movable).
+It would help in some cases where `op1` and `op2` want to take ownership, but here we are lost.
+
+So now we try to change the function to avoid this issue:
+```c++
+auto operator*() {
+    decltype(auto) v = *base_iter_;  // change here decltype(auto) vs auto
+    
+    if (pred(v)) {
+        return op1(v);
+    } else {
+        return op2(v);
+    }
+}
+```
+
+Nice, now we don't unnecessarily copy the vector. But there is an issue.
+
+Example 2:
+- the return-type of the base iterator is `std::vector<int>` (plain value)
+- pred takes its argument by `const &`
+- op1 and op2 want to take ownership of the vector to transform it, so they take it by value
+
+Now, we again copy the vector, this time at the `op1` and `op2` calls.
+
+Ok, surely now we just put `std::move(v)` into the `op1` and `op2` calls, right?
+
+No, wrong again.
+
+Example 3:
+In the case of `std::vector<std::vector<int>>` (non-const) the outer-vector-iterator returns `std::vector<int> &`,
+and our view would always move all values out of the outer vector. This is certainly wrong any not what
+our caller expected, if they had wanted that they would have used `std::views::as_rvalue`, but they did not.
+
+And now we are stuck writing repetitive `if constexpr (std::is_reference_v<decltype(v)>)` branches everywhere
+and basically have two implementations of exactly the same function, one for references and one for values.
+
+The solution is `DICE_MOVE_IF_VALUE` from dice-template-library. We, once again, rewrite the function
+
+```c++
+decltype(auto) operator*() {
+    decltype(auto) v = *base_iter_;
+    
+    if (pred(v)) {
+        return op1(DICE_MOVE_IF_VALUE(v));
+    } else {
+        return op2(DICE_MOVE_IF_VALUE(v));
+    }
+}
+```
+
+Finally, we have arrived at a solution that is as efficient as it can be. No necessary copies.
+
+And we are left wondering... Why is C++ this way? Somehow all these problems only exist in C++, rust has **ZERO** of them.
