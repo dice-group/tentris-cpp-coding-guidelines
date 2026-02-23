@@ -41,12 +41,15 @@ BraceWrapping:
   SplitEmptyNamespace: false
   BeforeLambdaBody: false
   BeforeWhile: false
+BinPackArguments: false
+BinPackParameters: false
+BinPackLongBracedList: false
 BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
-ColumnLimit: 0
+ColumnLimit: 140
 CompactNamespaces: true
 ContinuationIndentWidth: 4
 DerivePointerAlignment: false
