@@ -59,6 +59,7 @@ IndentCaseLabels: true
 IndentPPDirectives: None
 IndentRequiresClause: false
 IndentWidth: 4
+InsertBraces: true
 KeepEmptyLinesAtTheStartOfBlocks: true
 LambdaBodyIndentation: Signature
 Language: Cpp
