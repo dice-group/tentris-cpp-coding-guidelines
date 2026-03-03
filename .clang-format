@@ -49,7 +49,7 @@ BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
-ColumnLimit: 140
+ColumnLimit: 0
 CompactNamespaces: true
 ContinuationIndentWidth: 4
 DerivePointerAlignment: false
