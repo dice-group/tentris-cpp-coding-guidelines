@@ -49,8 +49,8 @@ BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
-ColumnLimit: 140
-CompactNamespaces: true
+ColumnLimit: 0
+CompactNamespaces: false
 ContinuationIndentWidth: 4
 DerivePointerAlignment: false
 PackConstructorInitializers: Never
