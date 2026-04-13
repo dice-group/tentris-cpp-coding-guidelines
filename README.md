@@ -265,16 +265,33 @@ it occasionally.
 
 
 ### Single-Use Ranges
-They don't exist. There is no such thing as a single-use range, it is assumed that you can call `begin()` as often as you want
-on any range.
-
-The following is **not** a valid range, even though it could technically be one.
+They exist (kind of), but they are implemented in the most hacky way possible.
+The following is **not** a valid range, even though it could technically be one (`std::ranges::range` just does not permit this).
 ```c++
 struct R {
     auto begin() &&;
     static auto end();
 };
 ```
+
+To see how the standard library does it instead, we have to look at `std::ranges::subrange`.
+
+You see, `std::ranges::subrange` is supposed to work with move-only iterators.
+But since `begin()` is supposed to be non-const, lvalue-qualified, `std::ranges::subrange`
+cannot use `auto begin() &&` when the underlying iterator is move-only. 
+
+So what does it do instead? It just **moves the iterator out of the subrange on the first
+call to `begin()`.** Mind you, there is no extra check if the iterator was already moved out on subsequent calls to `begin()`,
+so it just gives you a moved-from iterator on subsequent calls. No exception, no warning at all, you just get a moved-from iterator;
+whatever that means for your iterator, could be an end iterator, could be garbage.
+
+The extra great thing is that you usually cannot tell from the call site that this is probably not the behavior you wanted
+(because `subrange` is commonly used with class-template-argument deduction, or the type is entirely opaque if you are inside a 
+function with `std::ranges::range auto` parameter).
+
+All because, apparently, a single bool+branch to guard against this error category is too much overhead.
+
+At least it is documented on cppreference, but honestly, who reads the documentation of a `begin()` function.
 
 ### Reversible Ranges
 You probably know `std::views::reverse`, it is a handy tool to reverse any range. Except that it isn't always.
