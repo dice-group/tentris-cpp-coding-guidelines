@@ -407,3 +407,45 @@ decltype(auto) operator*() {
 Finally, we have arrived at a solution that is as efficient as it can be. No necessary copies.
 
 And we are left wondering... Why is C++ this way? Somehow all these problems only exist in C++, rust has **ZERO** of them.
+
+## Running `clang-format` on existing code
+
+`.clang-format` sets `ColumnLimit: 0`. Nothing then forces a line break by width, so clang-format
+puts a statement on one line unless another rule breaks it. Running it over code that a person
+wrapped by hand joins those lines again.
+
+This is written out over six lines in the source:
+
+```c++
+erase_unchecked(alloc, root, depth, min, max, cmp, key, EraseStepData<ChildNodeType>{
+    .current_page = std::move(mut_child),
+    .rebalancing_data = RebalancingData<ChildNodeType>{
+        .operation = MergeRebalance<ChildNodeType>{.partner_page = std::move(other_child)},
+        .side = other_child_side,
+        .parent_split_key = &split_key}});
+```
+
+clang-format joins it into one line of 414 characters. `BinPackArguments`, `BinPackParameters`,
+`BinPackLongBracedList` and `PackConstructorInitializers` are already set to their non-packing
+values and do not prevent it. They decide how to break once a break is needed, and without a
+column limit none ever is.
+
+Setting a column limit does not fix this. A finite limit makes clang-format reflow to fill lines
+up to it, so it rewraps shorter lines as well. Measured over the 109 source files of
+tentris-storage with clang-format 21.1.8:
+
+| ColumnLimit | files a full format changes | changed lines | longest line after |
+|---|---:|---:|---:|
+| 0 (current) | 95 of 109 | 14,404 | 414 |
+| 140 | 101 | 22,942 | 269 |
+| 200 | 100 | 20,679 | 269 |
+
+So every value costs more churn than 0, and one construct stays at 269 characters whatever the
+limit is.
+
+What to do instead:
+
+- Format new files.
+- Leave existing hand-wrapped files alone.
+- Do not run `clang-format-diff` over part of a multi-line statement. It reformats the whole
+  statement, so a one-line change can join the twenty lines around it.
