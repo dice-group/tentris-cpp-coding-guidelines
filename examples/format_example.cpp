@@ -371,9 +371,9 @@ namespace dice::format_example {
         auto squares = values //
             | std::views::filter([](int v) { return v % 2 == 0; })
             | std::views::transform([](int v) {
-                  auto const square = v * v;
-                  return square;
-              })
+                           auto const square = v * v;
+                           return square;
+                       })
             | std::views::take(10);
 
         auto const total = std::ranges::fold_left(
