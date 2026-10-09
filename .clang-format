@@ -40,7 +40,7 @@ AlignConsecutiveDeclarations: None
 AlignConsecutiveMacros: None
 AlignConsecutiveShortCaseStatements:
   Enabled: false
-AlignEscapedNewlines: DontAlign
+AlignEscapedNewlines: Left
 AlignTrailingComments:
   Kind: Never
 SpacesBeforeTrailingComments: 1
@@ -58,12 +58,12 @@ BreakBeforeTernaryOperators: true
 BreakStringLiterals: false
 Cpp11BracedListStyle: true
 
-# Braces: K&R everywhere, always present; `{` goes on its own line after a multi-line condition (like rustfmt)
+# Braces: K&R everywhere, always present; `{` stays on the last line even after a multi-line condition
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
-  AfterControlStatement: MultiLine
+  AfterControlStatement: Never
   AfterEnum: false
   AfterExternBlock: false
   AfterFunction: false
@@ -96,7 +96,7 @@ LambdaBodyIndentation: Signature
 BreakAfterReturnType: None
 BreakTemplateDeclarations: Yes
 BreakBeforeConceptDeclarations: Always
-RequiresClausePosition: OwnLine
+RequiresClausePosition: OwnLineWithBrace
 IndentRequiresClause: false
 RequiresExpressionIndentation: OuterScope
 BreakAfterAttributes: Leave
@@ -117,12 +117,12 @@ IndentCaseLabels: true
 IndentPPDirectives: None
 IndentExternBlock: Indent
 
-# Pointers/references bind to the type, as in Rust (`&T`)
+# Pointers/references bind to the name (`T const &value`, `T *ptr`); cv-qualifiers go right of what they qualify
 DerivePointerAlignment: false
-PointerAlignment: Left
+PointerAlignment: Right
 ReferenceAlignment: Pointer
 QualifierAlignment: Custom
-QualifierOrder: ['inline', 'static', 'constexpr', 'const', 'volatile', 'type']
+QualifierOrder: ['inline', 'static', 'constexpr', 'type', 'const', 'volatile']
 
 # Spaces
 SpaceAfterCStyleCast: true
