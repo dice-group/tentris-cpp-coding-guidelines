@@ -1,77 +1,130 @@
-AccessModifierOffset: -4
-AlignAfterOpenBracket: Align
+# Styled to look very similar to rustfmt output. Another C like language and the community has spent considerable time
+# on standardizing a single format. By adopting that style we are immediately familiar instead of having our own special specific formatting unique to just our project.
+# Requires clang-format >= 22 (BreakAfterOpenBracket*/BreakBeforeCloseBracket*/BreakBeforeTemplateCloser).
+Language: Cpp
+Standard: c++20
+BasedOnStyle: LLVM
+
+# Whitespace basics
+ColumnLimit: 120
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+LineEnding: LF
+InsertNewlineAtEOF: true
+MaxEmptyLinesToKeep: 1
+KeepEmptyLines:
+  AtEndOfFile: false
+  AtStartOfBlock: false
+  AtStartOfFile: false
+
+# Block indentation instead of visual alignment
+AlignAfterOpenBracket: false
+BreakAfterOpenBracketFunction: true
+BreakBeforeCloseBracketFunction: true
+BreakAfterOpenBracketBracedList: true
+BreakBeforeCloseBracketBracedList: true
+BreakAfterOpenBracketIf: true
+BreakBeforeCloseBracketIf: false
+BreakAfterOpenBracketLoop: true
+BreakBeforeCloseBracketLoop: false
+BreakAfterOpenBracketSwitch: true
+BreakBeforeCloseBracketSwitch: false
+BreakBeforeTemplateCloser: true
+AlignOperands: DontAlign
+AlignArrayOfStructures: None
 AlignConsecutiveAssignments: None
 AlignConsecutiveBitFields: None
 AlignConsecutiveDeclarations: None
 AlignConsecutiveMacros: None
-AlignOperands: Align
-AlignTrailingComments: true
+AlignConsecutiveShortCaseStatements:
+  Enabled: false
+AlignEscapedNewlines: Left
+AlignTrailingComments:
+  Kind: Never
+SpacesBeforeTrailingComments: 1
+
+# All on one line, or one item per line
+BinPackArguments: false
+BinPackParameters: OnePerLine
+BinPackLongBracedList: false
 AllowAllArgumentsOnNextLine: false
-AllowAllConstructorInitializersOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: Never
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortCompoundRequirementOnASingleLine: true
-AllowShortEnumsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLambdasOnASingleLine: None
-AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterReturnType: None
-AlwaysBreakTemplateDeclarations: Yes
-AttributeMacros:
-  - __capability
-BasedOnStyle: LLVM
+PackConstructorInitializers: CurrentLine
+BreakBinaryOperations: RespectPrecedence
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: true
+BreakStringLiterals: false
+Cpp11BracedListStyle: true
+
+# Braces: K&R everywhere, always present; `{` stays on the last line even after a multi-line condition
+BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
-  AfterControlStatement: MultiLine
+  AfterControlStatement: Never
   AfterEnum: false
+  AfterExternBlock: false
   AfterFunction: false
   AfterNamespace: false
-  AfterObjCDeclaration: false
   AfterStruct: false
   AfterUnion: false
-  AfterExternBlock: false
   BeforeCatch: false
   BeforeElse: false
-  IndentBraces: false
-  SplitEmptyFunction: false
-  SplitEmptyRecord: true
-  SplitEmptyNamespace: false
   BeforeLambdaBody: false
   BeforeWhile: false
-BinPackArguments: false
-BinPackParameters: false
-BinPackLongBracedList: false
-BreakBeforeBinaryOperators: All
-BreakBeforeBraces: Custom
-BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeColon
-BreakInheritanceList: BeforeColon
-ColumnLimit: 0
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: false
+  SplitEmptyRecord: false
+InsertBraces: true
+EnumTrailingComma: Insert
+
+# Short things on a single line only where rustfmt does it too
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortCompoundRequirementOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+LambdaBodyIndentation: Signature
+
+# Declarations
+BreakAfterReturnType: None
+BreakTemplateDeclarations: Yes
+BreakBeforeConceptDeclarations: Always
+RequiresClausePosition: OwnLineWithBrace
+IndentRequiresClause: false
+RequiresExpressionIndentation: OuterScope
+BreakAfterAttributes: Leave
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+ConstructorInitializerIndentWidth: 4
+IndentWrappedFunctionNames: false
+AccessModifierOffset: -4
+EmptyLineBeforeAccessModifier: LogicalBlock
+EmptyLineAfterAccessModifier: Never
+
+# Namespaces are indented like Rust `mod` blocks
+NamespaceIndentation: All
 CompactNamespaces: false
-ContinuationIndentWidth: 4
-DerivePointerAlignment: false
-PackConstructorInitializers: Never
 FixNamespaceComments: true
+ShortNamespaceLines: 0
 IndentCaseLabels: true
 IndentPPDirectives: None
-IndentRequiresClause: false
-IndentWidth: 4
-InsertBraces: true
-KeepEmptyLinesAtTheStartOfBlocks: true
-LambdaBodyIndentation: Signature
-Language: Cpp
-MaxEmptyLinesToKeep: 2
-NamespaceIndentation: All
-ObjCSpaceAfterProperty: false
-ObjCSpaceBeforeProtocolList: true
+IndentExternBlock: Indent
+
+# Pointers/references bind to the name (`T const &value`, `T *ptr`); cv-qualifiers go right of what they qualify
+DerivePointerAlignment: false
 PointerAlignment: Right
+ReferenceAlignment: Pointer
 QualifierAlignment: Custom
 QualifierOrder: ['inline', 'static', 'constexpr', 'type', 'const', 'volatile']
-ReflowComments: false
-RequiresClausePosition: WithPreceding
+
+# Spaces
 SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: false
@@ -79,6 +132,7 @@ SpaceBeforeAssignmentOperators: true
 SpaceBeforeCpp11BracedList: false
 SpaceBeforeCtorInitializerColon: true
 SpaceBeforeInheritanceColon: true
+SpaceBeforeRangeBasedForLoopColon: true
 SpaceBeforeParens: Custom
 SpaceBeforeParensOptions:
   AfterControlStatements: true
@@ -87,18 +141,26 @@ SpaceBeforeParensOptions:
   AfterFunctionDefinitionName: false
   AfterIfMacros: true
   AfterOverloadedOperator: false
-  BeforeNonEmptyParentheses: false
   AfterRequiresInClause: true
   AfterRequiresInExpression: true
-SpaceBeforeRangeBasedForLoopColon: true
-SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 2
-SpacesInAngles: false
-SpacesInCStyleCastParentheses: false
+  BeforeNonEmptyParentheses: false
+SpaceInEmptyBlock: false
+SpacesInAngles: Never
 SpacesInContainerLiterals: false
-SpacesInParentheses: false
+SpacesInParens: Never
 SpacesInSquareBrackets: false
-Standard: c++20
-TabWidth: 4
-UseCRLF: false
-UseTab: Never
+
+# Comments and includes: leave comment text alone (rustfmt's wrap_comments = false), sort includes per block
+ReflowComments: false
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+
+# Penalties: rustfmt only breaks after `=` when the right-hand side cannot be split inside its brackets;
+# never break after `::`
+PenaltyBreakAssignment: 1000
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyBreakScopeResolution: 10000
+PenaltyBreakBeforeFirstCallParameter: 0
+
+AttributeMacros:
+  - __capability
