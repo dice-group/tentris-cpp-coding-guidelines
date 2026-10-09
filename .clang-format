@@ -1,6 +1,6 @@
 # Styled to look very similar to rustfmt output. Another C like language and the community has spent considerable time
 # on standardizing a single format. By adopting that style we are immediately familiar instead of having our own special specific formatting unique to just our project.
-# Requires clang-format >= 22 (BreakBeforeTemplateCloser); also works with CLion's bundled pre-release 22.
+# Requires clang-format >= 22 (BreakAfterOpenBracket*/BreakBeforeCloseBracket*/BreakBeforeTemplateCloser).
 Language: Cpp
 Standard: c++20
 BasedOnStyle: LLVM
@@ -20,20 +20,17 @@ KeepEmptyLines:
   AtStartOfFile: false
 
 # Block indentation instead of visual alignment
-# TODO: Uncomment once CLion bundles a non-prerelease clang-format 22.
-# For now we fall back to BlockIndent.
-#   AlignAfterOpenBracket: false
-#   BreakAfterOpenBracketFunction: true
-#   BreakBeforeCloseBracketFunction: true
-#   BreakAfterOpenBracketBracedList: true
-#   BreakBeforeCloseBracketBracedList: true
-#   BreakAfterOpenBracketIf: true
-#   BreakBeforeCloseBracketIf: false
-#   BreakAfterOpenBracketLoop: true
-#   BreakBeforeCloseBracketLoop: false
-#   BreakAfterOpenBracketSwitch: true
-#   BreakBeforeCloseBracketSwitch: false
-AlignAfterOpenBracket: BlockIndent
+AlignAfterOpenBracket: false
+BreakAfterOpenBracketFunction: true
+BreakBeforeCloseBracketFunction: true
+BreakAfterOpenBracketBracedList: true
+BreakBeforeCloseBracketBracedList: true
+BreakAfterOpenBracketIf: true
+BreakBeforeCloseBracketIf: false
+BreakAfterOpenBracketLoop: true
+BreakBeforeCloseBracketLoop: false
+BreakAfterOpenBracketSwitch: true
+BreakBeforeCloseBracketSwitch: false
 BreakBeforeTemplateCloser: true
 AlignOperands: DontAlign
 AlignArrayOfStructures: None
