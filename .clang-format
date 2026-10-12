@@ -6,7 +6,7 @@ Standard: c++20
 BasedOnStyle: LLVM
 
 # Whitespace basics
-ColumnLimit: 120
+ColumnLimit: 140
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
@@ -150,8 +150,8 @@ SpacesInContainerLiterals: false
 SpacesInParens: Never
 SpacesInSquareBrackets: false
 
-# Comments and includes: leave comment text alone (rustfmt's wrap_comments = false), sort includes per block
-ReflowComments: false
+# Comments and includes: re-indent comments but leave their text alone (rustfmt's wrap_comments = false), sort includes per block
+ReflowComments: IndentOnly
 SortIncludes: CaseSensitive
 IncludeBlocks: Preserve
 

@@ -69,6 +69,13 @@ namespace dice::format_example {
         bool verbose = false;
     };
 
+    /**
+     * Multi-line block comment; its continuation lines are indented together with the first line.
+     */
+    struct Documented {
+        int value;
+    };
+
     struct Base {
         virtual ~Base() = default;
         virtual void run() = 0;
@@ -126,12 +133,7 @@ namespace dice::format_example {
         }
     };
 
-    template<
-        typename Key,
-        typename Value,
-        typename Hash = std::hash<Key>,
-        typename Allocator = std::allocator<std::pair<Key const, Value>>
-    >
+    template<typename Key, typename Value, typename Hash = std::hash<Key>, typename Allocator = std::allocator<std::pair<Key const, Value>>>
     struct Cache {
         using key_type = Key;
         using value_type = Value;
@@ -173,12 +175,7 @@ namespace dice::format_example {
     }
 
     template<typename T>
-    [[nodiscard]] T const &pointer_and_reference_alignment(
-        T const *pointer,
-        T const &reference,
-        T &&forwarding,
-        T **double_pointer
-    ) {
+    [[nodiscard]] T const &pointer_and_reference_alignment(T const *pointer, T const &reference, T &&forwarding, T **double_pointer) {
         (void) forwarding;
         (void) double_pointer;
         if (pointer != nullptr) {
@@ -279,10 +276,7 @@ namespace dice::format_example {
         );
         auto const nested = function_with_a_long_signature(
             std::string_view{"nested"},
-            std::vector<std::uint64_t>{
-                static_cast<std::uint64_t>(short_function(1)),
-                static_cast<std::uint64_t>(short_function(2))
-            },
+            std::vector<std::uint64_t>{static_cast<std::uint64_t>(short_function(1)), static_cast<std::uint64_t>(short_function(2))},
             std::nullopt
         );
         (void) value;
@@ -301,20 +295,8 @@ namespace dice::format_example {
             .verbose = true
         };
         std::vector<int> const numbers{1, 2, 3, 4, 5};
-        std::vector<std::string> const words{
-            "alpha",
-            "beta",
-            "gamma",
-            "delta",
-            "epsilon",
-            "zeta",
-            "eta",
-            "theta",
-            "iota",
-            "kappa",
-            "lambda",
-            "mu"
-        };
+        std::vector<std::string> const
+            words{"alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu"};
         std::map<std::string, int> const mapping{{"one", 1}, {"two", 2}, {"three", 3}};
         std::vector<Point> const points{
             {1.0, 2.0},
@@ -322,8 +304,8 @@ namespace dice::format_example {
         };
         int raw_array[] = {1, 2, 3};
         auto const *const c_string = "hello";
-        (void) p, (void) q, (void) short_config, (void) long_config, (void) numbers, (void) words, (void) mapping,
-            (void) points, (void) raw_array, (void) c_string;
+        (void) p, (void) q, (void) short_config, (void) long_config, (void) numbers, (void) words, (void) mapping, (void) points,
+            (void) raw_array, (void) c_string;
     }
 
     void lambdas() {
@@ -376,15 +358,11 @@ namespace dice::format_example {
               })
             | std::views::take(10);
 
-        auto const total = std::ranges::fold_left(
-            values | std::views::filter([](int v) { return v > 0; }),
-            0,
-            std::plus<>{}
-        );
+        auto const total = std::ranges::fold_left(values | std::views::filter([](int v) { return v > 0; }), 0, std::plus<>{});
 
         std::string text{"hello"};
         text.append(" world")
-            .append(", this is a long chain of appends")
+            .append(", this is an extremely long chain of appends")
             .append(" that will not fit on a single line")
             .append("!");
     }
@@ -446,6 +424,13 @@ namespace dice::format_example {
 
     extern "C" {
         int c_function(int x);
+
+        /**
+         * A C-compatible struct
+         */
+        typedef struct c_struct {
+            int x; ///< the x value
+        } c_struct;
     }
 
 } // namespace dice::format_example
