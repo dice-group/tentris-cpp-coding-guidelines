@@ -240,6 +240,80 @@ Use explicit declarations for deducing this.
 Reason: the explicit version is just a little too much boilerplate for regular usage. 
 
 
+## Documentation comments
+
+### Order of the Doxygen tags
+
+Write the description first. Then write the tags in this order:
+
+1. `@tparam`
+2. `@param`
+3. `@pre`
+4. `@return`
+5. `@post`
+6. `@throws`
+7. `@warning`
+8. `@note`
+9. `@see`
+
+The order follows the questions of a caller: what goes into the call, what comes out of it, how it
+fails, what to be careful about, and where to read more. A `@warning` comes before a `@note`,
+because a warning is more important. Write the `@tparam` and `@param` lines in the order of the
+declaration.
+
+```cpp
+/**
+ * Copy at most `n` elements from the front of `src` to the front of `dst`.
+ *
+ * @tparam T the element type
+ * @param src the elements to copy
+ * @param dst the target
+ * @param n the maximum number of elements to copy
+ * @pre `src` and `dst` do not overlap
+ * @return the number of elements copied
+ * @post the first elements of `dst` are equal to the copied elements of `src`
+ * @throws std::length_error if `dst` has fewer than `n` elements
+ * @warning Two concurrent calls with the same `dst` are a data race.
+ * @note The call does not allocate.
+ * @see std::ranges::copy_n
+ */
+template<typename T>
+size_t copy_front(std::span<T const> src, std::span<T> dst, size_t n);
+```
+
+### Exceptions in `@throws` lines
+
+A function comment names the exceptions of its own function only in `@throws` lines, never in the
+description. Write one `@throws` line for each exception: Doxygen takes the first word after the tag
+as the name of the exception, so `@throws A or B` documents only `A`. Do not write a backtick right
+after the tag. List every exception that the function can throw, also the exceptions of the
+functions that it calls, because a partial list misleads more than no list. The section
+[`noexcept` and allocations](#noexcept-and-allocations) says when an allocation failure counts.
+
+A sentence about an exception of another function can stay in the description, for example
+"`await_read` throws `UnknownPage` for this ticket". A sentence about the effect of a throw can also
+stay, for example "A throw undoes the reservation".
+
+```cpp
+/**
+ * Pin the page of `handle`.
+ *
+ * @param handle the page to pin
+ * @return a pinned handle to the page
+ * @throws UnknownPage if the page does not exist
+ * @throws PinError if no page can be evicted to make room
+ */
+```
+
+Not:
+
+```cpp
+/**
+ * Pin the page of `handle`. Throws `UnknownPage` if the page does not exist, and `PinError` if no
+ * page can be evicted to make room.
+ */
+```
+
 ## `std::ranges` from hell
 This section is about quirks in `std::ranges` that will come to haunt you if you ever need to write
 custom views.
