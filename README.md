@@ -240,6 +240,47 @@ Use explicit declarations for deducing this.
 Reason: the explicit version is just a little too much boilerplate for regular usage. 
 
 
+## Documentation comments
+
+### Order of the Doxygen tags
+
+Write the description first. Then write the tags in this order:
+
+1. `@tparam`
+2. `@param`
+3. `@pre`
+4. `@return`
+5. `@post`
+6. `@throws`
+7. `@warning`
+8. `@note`
+9. `@see`
+
+The order follows the questions of a caller: what goes into the call, what comes out of it, how it
+fails, what to be careful about, and where to read more. A `@warning` comes before a `@note`,
+because a warning is more important. Write the `@tparam` and `@param` lines in the order of the
+declaration.
+
+```cpp
+/**
+ * Copy at most `n` elements from the front of `src` to the front of `dst`.
+ *
+ * @tparam T the element type
+ * @param src the elements to copy
+ * @param dst the target
+ * @param n the maximum number of elements to copy
+ * @pre `src` and `dst` do not overlap
+ * @return the number of elements copied
+ * @post the first elements of `dst` are equal to the copied elements of `src`
+ * @throws std::length_error if `dst` has fewer than `n` elements
+ * @warning Two concurrent calls with the same `dst` are a data race.
+ * @note The call does not allocate.
+ * @see std::ranges::copy_n
+ */
+template<typename T>
+size_t copy_front(std::span<T const> src, std::span<T> dst, size_t n);
+```
+
 ## `std::ranges` from hell
 This section is about quirks in `std::ranges` that will come to haunt you if you ever need to write
 custom views.
