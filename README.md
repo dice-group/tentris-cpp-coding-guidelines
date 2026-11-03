@@ -281,6 +281,39 @@ template<typename T>
 size_t copy_front(std::span<T const> src, std::span<T> dst, size_t n);
 ```
 
+### Exceptions in `@throws` lines
+
+A function comment names the exceptions of its own function only in `@throws` lines, never in the
+description. Write one `@throws` line for each exception: Doxygen takes the first word after the tag
+as the name of the exception, so `@throws A or B` documents only `A`. Do not write a backtick right
+after the tag. List every exception that the function can throw, also the exceptions of the
+functions that it calls, because a partial list misleads more than no list. The section
+[`noexcept` and allocations](#noexcept-and-allocations) says when an allocation failure counts.
+
+A sentence about an exception of another function can stay in the description, for example
+"`await_read` throws `UnknownPage` for this ticket". A sentence about the effect of a throw can also
+stay, for example "A throw undoes the reservation".
+
+```cpp
+/**
+ * Pin the page of `handle`.
+ *
+ * @param handle the page to pin
+ * @return a pinned handle to the page
+ * @throws UnknownPage if the page does not exist
+ * @throws PinError if no page can be evicted to make room
+ */
+```
+
+Not:
+
+```cpp
+/**
+ * Pin the page of `handle`. Throws `UnknownPage` if the page does not exist, and `PinError` if no
+ * page can be evicted to make room.
+ */
+```
+
 ## `std::ranges` from hell
 This section is about quirks in `std::ranges` that will come to haunt you if you ever need to write
 custom views.
