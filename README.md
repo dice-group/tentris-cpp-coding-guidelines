@@ -407,3 +407,38 @@ decltype(auto) operator*() {
 Finally, we have arrived at a solution that is as efficient as it can be. No necessary copies.
 
 And we are left wondering... Why is C++ this way? Somehow all these problems only exist in C++, rust has **ZERO** of them.
+
+## `std::generator` from hell
+`std::generator` is actually much slower than I personally anticipated.
+It is so slow that it cannot keep up with I/O in some cases (meaning: switching to iterators actually makes a measurable difference in code that should be I/O bound).
+
+The reasons for the performance hit come down to design tradeoffs made during C++20/23 standardization.
+
+Both C++ and Rust use stackless coroutines, meaning they compile functions into state machines rather than allocating full call stacks.
+The difference is how those state machines are exposed: Rust returns an unboxed, concrete struct by value, whereas C++ type-erases the state machine behind a heap-allocated coroutine frame.
+
+By default, that architecture introduces two major overheads:
+- required heap allocation on generator construction
+- indirect function call per generator resume
+
+Rust’s gen blocks (and async futures) avoid both of these overheads.
+When you write a gen block in Rust, the compiler generates an anonymous, unnameable struct representing the exact state machine of that function, sized strictly to the variables held across yield points.
+
+That zero-cost model comes with its own tradeoffs:
+- Caller must know the size: To allocate the state machine on the stack, the caller has to know the concrete layout—meaning the implementation can't be hidden behind an opaque header/ABI boundary without boxing.
+- No default recursion: Because a recursive generator would have an infinite size, recursive calls require explicit heap allocation (boxing)
+- Pinning / Immovability (for self-referential states): While basic Rust gen blocks currently forbid holding references across yield points so they stay movable, self-referential coroutines (like Rust Futures) become immovable once polled.
+
+In Rust, whenever you hit one of those limitations, you opt into boxing (Box<dyn Iterator>).
+Essentially, C++'s std::generator is that boxed, dynamically dispatched version; except in C++, it is the only option out of the box.
+
+
+Why the C++ committee chose type erasure
+The committee prioritized ABI stability and ergonomics over guaranteed zero-cost abstraction, driven by requirements like:
+- Separate compilation: Defining generator functions inside .cpp files without exposing their internal state layout in headers.
+- Uniform types: Storing different generators in the same container (e.g., `std::vector<std::generator<T>>`) or writing recursive generators (`co_yield std::ranges::elements_of(...)`) without manual boxing.
+- Free movability: Moving a generator object around even after it has started executing, because the underlying coroutine frame lives at a stable address on the heap.
+
+All of those could have been solved by defaulting to an unboxed concrete type and letting developers box on demand (or use custom allocators). Instead, C++ defaulted to type erasure with the optimistic assumption that HALO (Heap Allocation eLision Optimization) would let the compiler optimize the allocations away.
+
+In practice, HALO is fragile; and when it fails in hot loops, you pay the price.
