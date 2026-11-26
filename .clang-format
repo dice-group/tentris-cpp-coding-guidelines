@@ -155,10 +155,19 @@ ReflowComments: IndentOnly
 
 # Includes: one block per group, separated by an empty line, sorted inside each block. The groups in order:
 #   0. the companion header of a source file (`Foo.hpp` in `Foo.cpp`), in the "" or the <> form
-#   1. local headers in the "" form
-#   2. headers of the dice-group and tentris libraries (<dice/...>, <tentris/...>, <rdf4cpp/...>, <rdf4cpp.hpp>)
-#   3. other third-party headers and C system headers (<doctest/doctest.h>, <boost/...>, <unistd.h>, <sys/mman.h>)
-#   4. C++ standard library headers (<vector>, <cstdint>)
+#   1. <dice/template-library/format_to_ostream.hpp>
+#   2. doctest headers (<doctest/doctest.h>)
+#   3. local headers in the "" form
+#   4. headers of the dice-group and tentris libraries (<dice/...>, <tentris/...>, <rdf4cpp/...>, <rdf4cpp.hpp>)
+#   5. other third-party headers and C system headers (<boost/...>, <unistd.h>, <sys/mman.h>)
+#   6. C++ standard library headers (<vector>, <cstdint>)
+# Groups 1 and 2 have a fixed position:
+#   - format_to_ostream.hpp declares an operator<< in the global namespace. doctest finds this operator for a type
+#     in a named namespace only if the operator is declared before doctest.h. If not, a failed check prints `{?}`.
+#   - Test headers use doctest macros (CHECK, REQUIRE, MESSAGE) and often do not include doctest.h. The
+#     preprocessor expands a macro only if doctest.h comes before the header.
+# clang-format never moves an include across a line that is not an include, for example `#define DOCTEST_CONFIG_...`.
+# Thus a doctest configuration macro stays before doctest.h.
 # clang-format finds the companion header from the file name only (`Foo.cpp` -> any include with the stem `Foo`).
 # The match ignores case. It does not check the directory, and it only looks at the first block of includes.
 SortIncludes: CaseSensitive
@@ -166,15 +175,19 @@ IncludeBlocks: Regroup
 MainIncludeChar: Any
 IncludeIsMainRegex: '$'
 IncludeCategories:
-  - Regex: '^"'
+  - Regex: '^<dice/template-library/format_to_ostream\.hpp>$'
     Priority: 1
-  - Regex: '^<(dice|tentris|rdf4cpp)[/.]'
+  - Regex: '^<doctest/'
     Priority: 2
-  - Regex: '^<[a-z0-9_]+>$'
+  - Regex: '^"'
+    Priority: 3
+  - Regex: '^<(dice|tentris|rdf4cpp)[/.]'
     Priority: 4
+  - Regex: '^<[a-z0-9_]+>$'
+    Priority: 6
     CaseSensitive: true
   - Regex: '^<'
-    Priority: 3
+    Priority: 5
 
 # Penalties: rustfmt only breaks after `=` when the right-hand side cannot be split inside its brackets;
 # never break after `::`
