@@ -150,10 +150,31 @@ SpacesInContainerLiterals: false
 SpacesInParens: Never
 SpacesInSquareBrackets: false
 
-# Comments and includes: re-indent comments but leave their text alone (rustfmt's wrap_comments = false), sort includes per block
+# Comments: re-indent comments but leave their text alone (rustfmt's wrap_comments = false)
 ReflowComments: IndentOnly
+
+# Includes: one block per group, separated by an empty line, sorted inside each block. The groups in order:
+#   0. the companion header of a source file (`Foo.hpp` in `Foo.cpp`), in the "" or the <> form
+#   1. local headers in the "" form
+#   2. headers of the dice-group and tentris libraries (<dice/...>, <tentris/...>, <rdf4cpp/...>, <rdf4cpp.hpp>)
+#   3. other third-party headers and C system headers (<doctest/doctest.h>, <boost/...>, <unistd.h>, <sys/mman.h>)
+#   4. C++ standard library headers (<vector>, <cstdint>)
+# clang-format finds the companion header from the file name only (`Foo.cpp` -> any include with the stem `Foo`).
+# The match ignores case. It does not check the directory, and it only looks at the first block of includes.
 SortIncludes: CaseSensitive
-IncludeBlocks: Preserve
+IncludeBlocks: Regroup
+MainIncludeChar: Any
+IncludeIsMainRegex: '$'
+IncludeCategories:
+  - Regex: '^"'
+    Priority: 1
+  - Regex: '^<(dice|tentris|rdf4cpp)[/.]'
+    Priority: 2
+  - Regex: '^<[a-z0-9_]+>$'
+    Priority: 4
+    CaseSensitive: true
+  - Regex: '^<'
+    Priority: 3
 
 # Penalties: rustfmt only breaks after `=` when the right-hand side cannot be split inside its brackets;
 # never break after `::`
